@@ -64,6 +64,17 @@ AI_REVIEW_BOTS = {
     "gemini": ["gemini-code-assist[bot]"],
 }
 
+# Bot usernames whose PR comments indicate CI test results are exposed.
+# Used with the GitHub Search API (requires authentication).
+# "konflux-ci-qe-bot" posts test scenario results with oras pull instructions.
+# "openshift-ci[bot]" indicates OpenShift CI (Prow) is managing the repo.
+# "codecov[bot]" and "codecov-commenter" indicate code coverage from test runs.
+CI_RESULTS_BOTS = {
+    "konflux_qe": ["konflux-ci-qe-bot"],
+    "openshift_ci": ["openshift-ci[bot]"],
+    "codecov": ["codecov[bot]", "codecov-commenter"],
+}
+
 # Workflow file patterns that indicate Qodo/PR-Agent usage (GitHub Actions)
 QODO_WORKFLOW_PATTERNS = [
     "qodo-ai/pr-agent",
@@ -111,8 +122,10 @@ class RepoInfo:
     tekton_files: list[str] = field(default_factory=list)
     has_openshift_ci: bool = False
     openshift_ci_sources: list[str] = field(default_factory=list)
-    has_junit_indicators: bool = False
-    junit_details: list[str] = field(default_factory=list)
+
+    # Test result exposure (beyond default Konflux build scans)
+    has_exposed_results: bool = False
+    exposed_results_evidence: list[str] = field(default_factory=list)
 
     @property
     def has_ai_review(self) -> bool:
@@ -123,8 +136,28 @@ class RepoInfo:
         return self.has_tekton or self.has_openshift_ci
 
     @property
-    def has_ci_with_junit(self) -> bool:
-        return self.has_ci
+    def ci_level(self) -> str:
+        """Categorize the CI level.
+
+        Returns one of:
+          - "none"
+          - "konflux" (build pipeline only)
+          - "konflux+results" (build pipeline + exposed test results)
+          - "openshift-ci" (OpenShift CI only)
+          - "konflux+openshift-ci" (both, inherently has results)
+        """
+        if not self.has_ci:
+            return "none"
+        parts = []
+        if self.has_tekton:
+            parts.append("konflux")
+        if self.has_openshift_ci:
+            parts.append("openshift-ci")
+        if self.has_exposed_results and "openshift-ci" not in parts:
+            # OpenShift CI inherently exposes junit, so only annotate
+            # konfux repos that also have evidence of exposed results
+            parts = ["konflux+results" if p == "konflux" else p for p in parts]
+        return "+".join(parts)
 
 
 # ---------------------------------------------------------------------------
@@ -565,6 +598,71 @@ def search_pr_comments_for_bots(
     return result
 
 
+def search_ci_results_bots(client: GitHubClient, org: str) -> dict[str, dict[str, int]]:
+    """Search for CI test-result bot comments on PRs across the org.
+
+    Looks for bots that post test result summaries, coverage reports,
+    or oras pull instructions on PRs. This is evidence that CI test
+    results are being exposed and accessible.
+
+    Returns:
+        dict mapping repo name -> {bot_category: pr_count}
+    """
+    if not client.token:
+        log.info("Skipping CI results bot search (requires --github-token).")
+        return {}
+
+    result: dict[str, dict[str, int]] = {}
+
+    for category, bot_names in CI_RESULTS_BOTS.items():
+        for bot in bot_names:
+            log.info(
+                "Searching for CI results bot %s (%s) activity...",
+                category,
+                bot,
+            )
+            page = 1
+            while True:
+                query = f"org:{org} is:pr commenter:{bot}"
+                encoded = urllib.parse.quote(query, safe=":")
+                try:
+                    status, data, _ = client.api_get(
+                        f"/search/issues?q={encoded}"
+                        f"&per_page=100&page={page}&sort=updated"
+                    )
+                except RateLimitExhausted:
+                    log.warning("Rate limit hit during CI bot search for %s", bot)
+                    break
+
+                if status == 422:
+                    log.debug("Search API rejected bot name %s (HTTP 422)", bot)
+                    break
+                if status != 200 or not isinstance(data, dict):
+                    log.warning("Search failed for %s (HTTP %d)", bot, status)
+                    break
+
+                items = data.get("items", [])
+                if not items:
+                    break
+
+                for item in items:
+                    repo_url = item.get("repository_url", "")
+                    repo_name = repo_url.rstrip("/").rsplit("/", 1)[-1]
+                    if repo_name:
+                        if repo_name not in result:
+                            result[repo_name] = {}
+                        result[repo_name][category] = (
+                            result[repo_name].get(category, 0) + 1
+                        )
+
+                if len(items) < 100:
+                    break
+                page += 1
+                time.sleep(2.1)
+
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Scanning pipeline
 # ---------------------------------------------------------------------------
@@ -619,14 +717,6 @@ def scan_repo(
             client, owner, name, branch
         )
 
-    if info.has_tekton:
-        info.has_junit_indicators = True
-        info.junit_details.append(
-            "Konflux build pipelines include scanning tasks that produce "
-            "TEST_OUTPUT results and attach SARIF/scan results to OCI images "
-            "via oras attach"
-        )
-
     return info
 
 
@@ -656,6 +746,10 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
     # Search for AI review bot activity on PRs (uses search API, needs auth)
     log.info("Searching for AI review bot activity on PRs...")
     pr_bot_activity = search_pr_comments_for_bots(client, org)
+
+    # Search for CI test-result bot activity (uses search API, needs auth)
+    log.info("Searching for CI test-result bot activity on PRs...")
+    ci_bot_activity = search_ci_results_bots(client, org)
 
     # Decide whether to use API for per-repo checks based on budget
     # Per-repo API usage: 1 call for .tekton/ dir, optionally 1 for workflows
@@ -695,14 +789,14 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
             if name in openshift_ci:
                 info.has_openshift_ci = True
                 info.openshift_ci_sources = openshift_ci[name]
-                if not info.has_junit_indicators:
-                    info.has_junit_indicators = True
-                    info.junit_details.append(
-                        "OpenShift CI (ci-operator) inherently produces "
-                        "junit_operator.xml and collects junit*.xml artifacts"
-                    )
+                # OpenShift CI inherently exposes junit results
+                info.has_exposed_results = True
+                info.exposed_results_evidence.append(
+                    "openshift_ci: ci-operator inherently produces "
+                    "junit_operator.xml and collects junit*.xml artifacts"
+                )
 
-            # Merge PR bot activity data
+            # Merge PR bot activity data (AI review)
             if name in pr_bot_activity:
                 for tool, pr_count in pr_bot_activity[name].items():
                     if tool not in info.ai_tools:
@@ -711,6 +805,27 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
                     detail = f"pr_comments: {pr_count} PRs with bot activity"
                     if detail not in info.ai_tool_details.get(tool, []):
                         info.ai_tool_details.setdefault(tool, []).append(detail)
+
+            # Merge CI results bot activity
+            if name in ci_bot_activity:
+                for category, pr_count in ci_bot_activity[name].items():
+                    if category == "openshift_ci":
+                        info.has_openshift_ci = True
+                        info.has_exposed_results = True
+                        info.exposed_results_evidence.append(
+                            f"openshift-ci[bot]: {pr_count} PRs with bot activity"
+                        )
+                    elif category == "konflux_qe":
+                        info.has_exposed_results = True
+                        info.exposed_results_evidence.append(
+                            f"konflux-ci-qe-bot: {pr_count} PRs with "
+                            f"test result summaries and oras pull instructions"
+                        )
+                    elif category == "codecov":
+                        info.has_exposed_results = True
+                        info.exposed_results_evidence.append(
+                            f"codecov: {pr_count} PRs with coverage reports"
+                        )
 
             results_map[name] = info
 
@@ -777,18 +892,13 @@ def format_text(results: list[RepoInfo], org_ai_configs: dict) -> str:
         lines.append("  are not detectable without admin API access.")
     lines.append("")
 
-    # Repos with CI / JUnit
+    # Repos with CI
     lines.append("-" * 80)
-    lines.append("REPOS WITH CI ENABLED (JUnit/Test Results Available)")
+    lines.append("REPOS WITH CI ENABLED")
     lines.append("-" * 80)
     if repos_with_ci:
         for r in repos_with_ci:
-            ci_types = []
-            if r.has_tekton:
-                ci_types.append("Konflux/Tekton")
-            if r.has_openshift_ci:
-                ci_types.append("OpenShift CI")
-            lines.append(f"\n  {r.full_name}  [{', '.join(ci_types)}]")
+            lines.append(f"\n  {r.full_name}  [{r.ci_level}]")
             if r.has_tekton:
                 lines.append(f"    Tekton pipelines: {len(r.tekton_files)} file(s)")
                 for f in r.tekton_files[:5]:
@@ -798,8 +908,9 @@ def format_text(results: list[RepoInfo], org_ai_configs: dict) -> str:
             if r.has_openshift_ci:
                 for src in r.openshift_ci_sources:
                     lines.append(f"    OpenShift CI: {src}")
-            for detail in r.junit_details:
-                lines.append(f"    JUnit: {detail}")
+            if r.has_exposed_results:
+                for ev in r.exposed_results_evidence:
+                    lines.append(f"    Results: {ev}")
     else:
         lines.append("  (none detected)")
     lines.append("")
@@ -864,12 +975,13 @@ def format_json(results: list[RepoInfo]) -> str:
                 },
                 "ci": {
                     "enabled": r.has_ci,
+                    "ci_level": r.ci_level,
                     "tekton": r.has_tekton,
                     "tekton_files": r.tekton_files,
                     "openshift_ci": r.has_openshift_ci,
                     "openshift_ci_sources": r.openshift_ci_sources,
-                    "junit_available": r.has_ci_with_junit,
-                    "junit_details": r.junit_details,
+                    "exposed_results": r.has_exposed_results,
+                    "exposed_results_evidence": r.exposed_results_evidence,
                 },
             }
         )
@@ -886,29 +998,26 @@ def format_csv(results: list[RepoInfo]) -> str:
             "has_ai_review",
             "ai_tools",
             "has_ci",
-            "ci_types",
+            "ci_level",
             "has_tekton",
             "has_openshift_ci",
+            "has_exposed_results",
             "has_both",
         ]
     )
     for r in results:
         if r.archived:
             continue
-        ci_types = []
-        if r.has_tekton:
-            ci_types.append("konflux")
-        if r.has_openshift_ci:
-            ci_types.append("openshift-ci")
         writer.writerow(
             [
                 r.full_name,
                 r.has_ai_review,
                 ";".join(r.ai_tools),
                 r.has_ci,
-                ";".join(ci_types),
+                r.ci_level,
                 r.has_tekton,
                 r.has_openshift_ci,
+                r.has_exposed_results,
                 r.has_ai_review and r.has_ci,
             ]
         )
