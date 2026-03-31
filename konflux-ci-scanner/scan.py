@@ -67,11 +67,12 @@ AI_REVIEW_BOTS = {
 # Bot usernames whose PR comments indicate CI test results are exposed.
 # Used with the GitHub Search API (requires authentication).
 # "konflux-ci-qe-bot" posts test scenario results with oras pull instructions.
-# "openshift-ci[bot]" indicates OpenShift CI (Prow) is managing the repo.
 # "codecov[bot]" and "codecov-commenter" indicate code coverage from test runs.
+# Note: "openshift-ci[bot]" is NOT included because its comments are typically
+# prow governance (LGTM, approve, needs-rebase) not test results. Real OpenShift
+# CI is detected via ci-operator/config/ entries in the openshift/release repo.
 CI_RESULTS_BOTS = {
     "konflux_qe": ["konflux-ci-qe-bot"],
-    "openshift_ci": ["openshift-ci[bot]"],
     "codecov": ["codecov[bot]", "codecov-commenter"],
 }
 
@@ -471,23 +472,43 @@ def check_ai_review_tools(
     return tools_found, details
 
 
+@dataclass
+class OpenShiftCIInfo:
+    """OpenShift CI detection results for a repo."""
+
+    # ci-operator configs mean real CI jobs that produce JUnit
+    has_ci_operator: bool = False
+    ci_operator_sources: list[str] = field(default_factory=list)
+    # prow governance (LGTM, approve, tide, etc.) -- NOT actual test jobs
+    has_prow_governance: bool = False
+    prow_governance_sources: list[str] = field(default_factory=list)
+
+
 def check_openshift_ci_batch(
     client: GitHubClient, org: str, repos: list[str]
-) -> dict[str, list[str]]:
+) -> dict[str, OpenShiftCIInfo]:
     """Batch-check OpenShift CI by listing org-level directories.
 
-    Lists each org-level directory in openshift/release once (3 API calls),
-    then matches repo names locally.
+    Distinguishes between:
+    - ci-operator/config/ and ci-operator/jobs/: Real CI jobs that
+      produce JUnit artifacts
+    - core-services/prow/02_config/: Prow governance plugins only
+      (LGTM, approve, tide, cherrypick, needs-rebase, etc.) -- these
+      do NOT run tests or produce JUnit
     """
-    result: dict[str, list[str]] = {}
+    result: dict[str, OpenShiftCIInfo] = {}
 
-    org_dirs = [
+    # Real CI job directories
+    ci_dirs = [
         f"ci-operator/config/{org}",
         f"ci-operator/jobs/{org}",
+    ]
+    # Prow governance directory (plugins only, not CI)
+    prow_dirs = [
         f"core-services/prow/02_config/{org}",
     ]
 
-    for org_dir in org_dirs:
+    for org_dir in ci_dirs:
         try:
             status, data, _ = client.api_get(
                 f"/repos/openshift/release/contents/{org_dir}"
@@ -501,11 +522,34 @@ def check_openshift_ci_batch(
             for repo in repos:
                 if repo in found_repos:
                     if repo not in result:
-                        result[repo] = []
-                    result[repo].append(f"{org_dir}/{repo}")
-                    log.debug("OpenShift CI config: %s/%s", org_dir, repo)
+                        result[repo] = OpenShiftCIInfo()
+                    result[repo].has_ci_operator = True
+                    result[repo].ci_operator_sources.append(f"{org_dir}/{repo}")
         elif status == 404:
-            log.debug("No OpenShift CI org dir: %s", org_dir)
+            log.debug("No OpenShift CI dir: %s", org_dir)
+        else:
+            log.warning("Error checking %s (HTTP %d)", org_dir, status)
+        time.sleep(0.1)
+
+    for org_dir in prow_dirs:
+        try:
+            status, data, _ = client.api_get(
+                f"/repos/openshift/release/contents/{org_dir}"
+            )
+        except RateLimitExhausted:
+            log.warning("Rate limit exhausted during prow governance check")
+            break
+
+        if status == 200 and isinstance(data, list):
+            found_repos = {e["name"] for e in data if e["type"] == "dir"}
+            for repo in repos:
+                if repo in found_repos:
+                    if repo not in result:
+                        result[repo] = OpenShiftCIInfo()
+                    result[repo].has_prow_governance = True
+                    result[repo].prow_governance_sources.append(f"{org_dir}/{repo}")
+        elif status == 404:
+            log.debug("No prow governance dir: %s", org_dir)
         else:
             log.warning("Error checking %s (HTTP %d)", org_dir, status)
         time.sleep(0.1)
@@ -815,20 +859,27 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
 
             # Merge OpenShift CI data
             if name in openshift_ci:
-                info.has_openshift_ci = True
-                info.openshift_ci_sources = openshift_ci[name]
-                # OpenShift CI inherently exposes junit results
-                info.has_exposed_results = True
-                info.exposed_results_evidence.append(
-                    "openshift_ci: ci-operator inherently produces "
-                    "junit_operator.xml and collects junit*.xml artifacts"
-                )
-                # Link to the first config dir in openshift/release
-                first_src = openshift_ci[name][0]
-                info.evidence_urls.setdefault(
-                    "openshift_ci",
-                    f"https://github.com/openshift/release/tree/master/{first_src}",
-                )
+                oci = openshift_ci[name]
+                if oci.has_ci_operator:
+                    # Real CI jobs -- produces JUnit artifacts
+                    info.has_openshift_ci = True
+                    info.openshift_ci_sources = oci.ci_operator_sources
+                    info.has_exposed_results = True
+                    info.exposed_results_evidence.append(
+                        "openshift_ci: ci-operator jobs produce "
+                        "junit_operator.xml and collect junit*.xml"
+                    )
+                    first_src = oci.ci_operator_sources[0]
+                    info.evidence_urls.setdefault(
+                        "openshift_ci",
+                        f"https://github.com/openshift/release/tree/master/{first_src}",
+                    )
+                if oci.has_prow_governance and not oci.has_ci_operator:
+                    # Prow governance only (LGTM, approve, tide) -- no CI
+                    log.debug(
+                        "%s has prow governance but no ci-operator jobs",
+                        name,
+                    )
 
             # Merge PR bot activity data (AI review)
             if name in pr_bot_activity:
@@ -846,13 +897,14 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
             if name in ci_bot_activity:
                 for category, (pr_count, example_url) in ci_bot_activity[name].items():
                     if category == "openshift_ci":
-                        info.has_openshift_ci = True
-                        info.has_exposed_results = True
-                        info.exposed_results_evidence.append(
-                            f"openshift-ci[bot]: {pr_count} PRs with bot activity"
-                        )
-                        info.evidence_urls.setdefault(
-                            "results:openshift_ci", example_url
+                        # openshift-ci[bot] comments are typically prow
+                        # governance (LGTM, approve, needs-rebase, tide).
+                        # They do NOT indicate test execution or JUnit
+                        # results. Real OpenShift CI is detected via
+                        # ci-operator/config/ entries above.
+                        log.debug(
+                            "%s has openshift-ci[bot] comments (governance)",
+                            name,
                         )
                     elif category == "konflux_qe":
                         info.has_exposed_results = True
