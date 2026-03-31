@@ -508,9 +508,15 @@ def scan_repo(
         return info
 
     # Check AI review tools (primarily uses raw, no API cost)
-    info.ai_tools, info.ai_tool_details = check_ai_review_tools(
-        client, owner, name, branch, use_api_for_workflows=use_api
-    )
+    try:
+        info.ai_tools, info.ai_tool_details = check_ai_review_tools(
+            client, owner, name, branch, use_api_for_workflows=use_api
+        )
+    except RateLimitExhausted:
+        log.debug("Rate limit hit during AI check for %s; retrying raw-only", name)
+        info.ai_tools, info.ai_tool_details = check_ai_review_tools(
+            client, owner, name, branch, use_api_for_workflows=False
+        )
 
     # Check Tekton/Konflux CI
     if use_api and client.api_budget_ok:
@@ -519,7 +525,7 @@ def scan_repo(
                 client, owner, name
             )
         except RateLimitExhausted:
-            log.warning("Rate limit hit; falling back to raw probes for %s", name)
+            log.debug("Rate limit hit; falling back to raw probes for %s", name)
             info.has_tekton, info.tekton_files = check_tekton_via_raw(
                 client, owner, name, branch
             )
