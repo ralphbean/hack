@@ -127,6 +127,10 @@ class RepoInfo:
     has_exposed_results: bool = False
     exposed_results_evidence: list[str] = field(default_factory=list)
 
+    # Evidence URLs for linking in reports.
+    # Keys: "ai:<tool>", "tekton", "openshift_ci", "results:<category>"
+    evidence_urls: dict[str, str] = field(default_factory=dict)
+
     @property
     def has_ai_review(self) -> bool:
         return len(self.ai_tools) > 0
@@ -531,7 +535,7 @@ def check_org_level_ai_configs(client: GitHubClient, org: str) -> dict[str, bool
 
 def search_pr_comments_for_bots(
     client: GitHubClient, org: str
-) -> dict[str, dict[str, int]]:
+) -> dict[str, dict[str, tuple[int, str]]]:
     """Search for AI review bot comments on PRs across the org.
 
     Uses the GitHub Search API to find PRs where known AI review bots
@@ -542,7 +546,7 @@ def search_pr_comments_for_bots(
     Uses the search rate limit (30 req/min), separate from core rate limit.
 
     Returns:
-        dict mapping repo name -> {tool_name: pr_count}
+        dict mapping repo name -> {tool_name: (pr_count, example_pr_url)}
     """
     if not client.token:
         log.info(
@@ -551,7 +555,7 @@ def search_pr_comments_for_bots(
         )
         return {}
 
-    result: dict[str, dict[str, int]] = {}
+    result: dict[str, dict[str, tuple[int, str]]] = {}
 
     for tool, bot_names in AI_REVIEW_BOTS.items():
         for bot in bot_names:
@@ -566,11 +570,13 @@ def search_pr_comments_for_bots(
                         f"&per_page=100&page={page}&sort=updated"
                     )
                 except RateLimitExhausted:
-                    log.warning("Rate limit hit during PR comment search for %s", tool)
+                    log.warning(
+                        "Rate limit hit during PR comment search for %s",
+                        tool,
+                    )
                     break
 
                 if status == 422:
-                    # Bot user not found / not searchable
                     log.debug("Search API rejected bot name %s (HTTP 422)", bot)
                     break
                 if status != 200 or not isinstance(data, dict):
@@ -584,21 +590,27 @@ def search_pr_comments_for_bots(
                 for item in items:
                     repo_url = item.get("repository_url", "")
                     repo_name = repo_url.rstrip("/").rsplit("/", 1)[-1]
+                    pr_url = item.get("html_url", "")
                     if repo_name:
                         if repo_name not in result:
                             result[repo_name] = {}
-                        result[repo_name][tool] = result[repo_name].get(tool, 0) + 1
+                        prev = result[repo_name].get(tool)
+                        count = (prev[0] if prev else 0) + 1
+                        # Keep the first (most recent) example URL
+                        example = prev[1] if prev else pr_url
+                        result[repo_name][tool] = (count, example)
 
                 if len(items) < 100:
                     break
                 page += 1
-                # Search API rate limit: 30 req/min
                 time.sleep(2.1)
 
     return result
 
 
-def search_ci_results_bots(client: GitHubClient, org: str) -> dict[str, dict[str, int]]:
+def search_ci_results_bots(
+    client: GitHubClient, org: str
+) -> dict[str, dict[str, tuple[int, str]]]:
     """Search for CI test-result bot comments on PRs across the org.
 
     Looks for bots that post test result summaries, coverage reports,
@@ -606,13 +618,13 @@ def search_ci_results_bots(client: GitHubClient, org: str) -> dict[str, dict[str
     results are being exposed and accessible.
 
     Returns:
-        dict mapping repo name -> {bot_category: pr_count}
+        dict mapping repo name -> {bot_category: (pr_count, example_pr_url)}
     """
     if not client.token:
         log.info("Skipping CI results bot search (requires --github-token).")
         return {}
 
-    result: dict[str, dict[str, int]] = {}
+    result: dict[str, dict[str, tuple[int, str]]] = {}
 
     for category, bot_names in CI_RESULTS_BOTS.items():
         for bot in bot_names:
@@ -648,12 +660,14 @@ def search_ci_results_bots(client: GitHubClient, org: str) -> dict[str, dict[str
                 for item in items:
                     repo_url = item.get("repository_url", "")
                     repo_name = repo_url.rstrip("/").rsplit("/", 1)[-1]
+                    pr_url = item.get("html_url", "")
                     if repo_name:
                         if repo_name not in result:
                             result[repo_name] = {}
-                        result[repo_name][category] = (
-                            result[repo_name].get(category, 0) + 1
-                        )
+                        prev = result[repo_name].get(category)
+                        count = (prev[0] if prev else 0) + 1
+                        example = prev[1] if prev else pr_url
+                        result[repo_name][category] = (count, example)
 
                 if len(items) < 100:
                     break
@@ -701,6 +715,14 @@ def scan_repo(
             client, owner, name, branch, use_api_for_workflows=False
         )
 
+    # Build evidence URLs for AI config files found
+    for tool, dets in info.ai_tool_details.items():
+        for d in dets:
+            if d.startswith("config: "):
+                path = d[len("config: ") :]
+                url = f"https://github.com/{owner}/{name}/blob/{branch}/{path}"
+                info.evidence_urls.setdefault(f"ai:{tool}", url)
+
     # Check Tekton/Konflux CI
     if use_api and client.api_budget_ok:
         try:
@@ -715,6 +737,12 @@ def scan_repo(
     else:
         info.has_tekton, info.tekton_files = check_tekton_via_raw(
             client, owner, name, branch
+        )
+
+    # Evidence URL for Tekton: link to .tekton/ directory
+    if info.has_tekton:
+        info.evidence_urls["tekton"] = (
+            f"https://github.com/{owner}/{name}/tree/{branch}/.tekton"
         )
 
     return info
@@ -795,25 +823,36 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
                     "openshift_ci: ci-operator inherently produces "
                     "junit_operator.xml and collects junit*.xml artifacts"
                 )
+                # Link to the first config dir in openshift/release
+                first_src = openshift_ci[name][0]
+                info.evidence_urls.setdefault(
+                    "openshift_ci",
+                    f"https://github.com/openshift/release/tree/master/{first_src}",
+                )
 
             # Merge PR bot activity data (AI review)
             if name in pr_bot_activity:
-                for tool, pr_count in pr_bot_activity[name].items():
+                for tool, (pr_count, example_url) in pr_bot_activity[name].items():
                     if tool not in info.ai_tools:
                         info.ai_tools.append(tool)
                         info.ai_tool_details[tool] = []
                     detail = f"pr_comments: {pr_count} PRs with bot activity"
                     if detail not in info.ai_tool_details.get(tool, []):
                         info.ai_tool_details.setdefault(tool, []).append(detail)
+                    # Store example PR URL as evidence
+                    info.evidence_urls.setdefault(f"ai:{tool}", example_url)
 
             # Merge CI results bot activity
             if name in ci_bot_activity:
-                for category, pr_count in ci_bot_activity[name].items():
+                for category, (pr_count, example_url) in ci_bot_activity[name].items():
                     if category == "openshift_ci":
                         info.has_openshift_ci = True
                         info.has_exposed_results = True
                         info.exposed_results_evidence.append(
                             f"openshift-ci[bot]: {pr_count} PRs with bot activity"
+                        )
+                        info.evidence_urls.setdefault(
+                            "results:openshift_ci", example_url
                         )
                     elif category == "konflux_qe":
                         info.has_exposed_results = True
@@ -821,11 +860,13 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
                             f"konflux-ci-qe-bot: {pr_count} PRs with "
                             f"test result summaries and oras pull instructions"
                         )
+                        info.evidence_urls.setdefault("results:konflux_qe", example_url)
                     elif category == "codecov":
                         info.has_exposed_results = True
                         info.exposed_results_evidence.append(
                             f"codecov: {pr_count} PRs with coverage reports"
                         )
+                        info.evidence_urls.setdefault("results:codecov", example_url)
 
             results_map[name] = info
 
@@ -983,6 +1024,7 @@ def format_json(results: list[RepoInfo]) -> str:
                     "exposed_results": r.has_exposed_results,
                     "exposed_results_evidence": r.exposed_results_evidence,
                 },
+                "evidence_urls": r.evidence_urls,
             }
         )
     return json.dumps(output, indent=2)
