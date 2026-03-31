@@ -56,6 +56,14 @@ AI_REVIEW_PROBES = {
     "gemini": [".gemini/config.yaml", ".gemini/styleguide.md"],
 }
 
+# Bot usernames that comment on PRs for each AI review tool.
+# Used with the GitHub Search API (requires authentication).
+AI_REVIEW_BOTS = {
+    "coderabbit": ["coderabbitai[bot]"],
+    "qodo": ["qodo-code-review[bot]"],
+    "gemini": ["gemini-code-assist[bot]"],
+}
+
 # Workflow file patterns that indicate Qodo/PR-Agent usage (GitHub Actions)
 QODO_WORKFLOW_PATTERNS = [
     "qodo-ai/pr-agent",
@@ -488,6 +496,75 @@ def check_org_level_ai_configs(client: GitHubClient, org: str) -> dict[str, bool
     return org_configs
 
 
+def search_pr_comments_for_bots(
+    client: GitHubClient, org: str
+) -> dict[str, dict[str, int]]:
+    """Search for AI review bot comments on PRs across the org.
+
+    Uses the GitHub Search API to find PRs where known AI review bots
+    have commented. This detects tools installed as GitHub Apps even
+    when no config file is present in the repo.
+
+    Requires authentication (search API is auth-only for some queries).
+    Uses the search rate limit (30 req/min), separate from core rate limit.
+
+    Returns:
+        dict mapping repo name -> {tool_name: pr_count}
+    """
+    if not client.token:
+        log.info(
+            "Skipping PR comment search (requires --github-token). "
+            "Only config-file-based detection will be used."
+        )
+        return {}
+
+    result: dict[str, dict[str, int]] = {}
+
+    for tool, bot_names in AI_REVIEW_BOTS.items():
+        for bot in bot_names:
+            log.info("Searching for %s bot (%s) activity...", tool, bot)
+            page = 1
+            while True:
+                query = f"org:{org} is:pr commenter:{bot}"
+                encoded = urllib.parse.quote(query, safe=":")
+                try:
+                    status, data, _ = client.api_get(
+                        f"/search/issues?q={encoded}"
+                        f"&per_page=100&page={page}&sort=updated"
+                    )
+                except RateLimitExhausted:
+                    log.warning("Rate limit hit during PR comment search for %s", tool)
+                    break
+
+                if status == 422:
+                    # Bot user not found / not searchable
+                    log.debug("Search API rejected bot name %s (HTTP 422)", bot)
+                    break
+                if status != 200 or not isinstance(data, dict):
+                    log.warning("Search failed for %s (HTTP %d)", bot, status)
+                    break
+
+                items = data.get("items", [])
+                if not items:
+                    break
+
+                for item in items:
+                    repo_url = item.get("repository_url", "")
+                    repo_name = repo_url.rstrip("/").rsplit("/", 1)[-1]
+                    if repo_name:
+                        if repo_name not in result:
+                            result[repo_name] = {}
+                        result[repo_name][tool] = result[repo_name].get(tool, 0) + 1
+
+                if len(items) < 100:
+                    break
+                page += 1
+                # Search API rate limit: 30 req/min
+                time.sleep(2.1)
+
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Scanning pipeline
 # ---------------------------------------------------------------------------
@@ -576,6 +653,10 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
         log.warning("Rate limit exhausted during OpenShift CI check; skipping")
         openshift_ci = {}
 
+    # Search for AI review bot activity on PRs (uses search API, needs auth)
+    log.info("Searching for AI review bot activity on PRs...")
+    pr_bot_activity = search_pr_comments_for_bots(client, org)
+
     # Decide whether to use API for per-repo checks based on budget
     # Per-repo API usage: 1 call for .tekton/ dir, optionally 1 for workflows
     # With N repos, we need roughly N API calls.
@@ -620,6 +701,16 @@ def scan_org(client: GitHubClient, org: str) -> list[RepoInfo]:
                         "OpenShift CI (ci-operator) inherently produces "
                         "junit_operator.xml and collects junit*.xml artifacts"
                     )
+
+            # Merge PR bot activity data
+            if name in pr_bot_activity:
+                for tool, pr_count in pr_bot_activity[name].items():
+                    if tool not in info.ai_tools:
+                        info.ai_tools.append(tool)
+                        info.ai_tool_details[tool] = []
+                    detail = f"pr_comments: {pr_count} PRs with bot activity"
+                    if detail not in info.ai_tool_details.get(tool, []):
+                        info.ai_tool_details.setdefault(tool, []).append(detail)
 
             results_map[name] = info
 
@@ -736,11 +827,11 @@ def format_text(results: list[RepoInfo], org_ai_configs: dict) -> str:
     lines.append("-" * 80)
     lines.append("CAVEATS")
     lines.append("-" * 80)
+    lines.append("  - With --github-token: AI tools are detected via both config files")
     lines.append(
-        "  - AI tools installed as GitHub Apps with default settings (no config"
+        "    AND PR comment history (search API). Without a token, only config"
     )
-    lines.append("    file) are NOT detectable without admin API access or PR comment")
-    lines.append("    inspection.")
+    lines.append("    file detection is available.")
     lines.append(
         "  - Tekton detection without API access uses filename probing and may"
     )
