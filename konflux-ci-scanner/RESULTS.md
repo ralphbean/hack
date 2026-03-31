@@ -26,132 +26,132 @@ CI is detected via:
 
 | Repository | AI Review | AI Tool(s) | AI Detection | CI Enabled | CI Type(s) | Has Both |
 |------------|-----------|------------|--------------|------------|------------|----------|
-| konflux-ci/.github | No | - | - | No | - | No |
-| konflux-ci/application-api | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/architecture | No | - | - | No | - | No |
-| konflux-ci/bazel-builder | No | - | - | No | - | No |
-| konflux-ci/brand-assets | No | - | - | No | - | No |
-| konflux-ci/build-definitions | Yes | qodo | pr_comments | Yes | Konflux/Tekton, OpenShift CI | **Yes** |
-| konflux-ci/build-pipeline-tasks | No | - | - | No | - | No |
-| konflux-ci/build-service | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
-| konflux-ci/build-ta-pipeline-migration | No | - | - | No | - | No |
-| konflux-ci/build-tasks-dockerfiles | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/build-trusted-artifacts | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/buildah-container | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/caching | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/capo | No | - | - | No | - | No |
-| konflux-ci/ci-helper-app | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/ci-terraform-runner | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/clair-in-ci-db | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/cli | No | - | - | No | - | No |
-| konflux-ci/cluster-template-charts | No | - | - | No | - | No |
-| konflux-ci/community | No | - | - | No | - | No |
-| konflux-ci/community-catalog | No | - | - | Yes | OpenShift CI | No |
-| konflux-ci/community-operators-prod | No | - | - | No | - | No |
-| konflux-ci/coverage-dashboard | Yes | qodo | pr_comments | No | - | No |
-| konflux-ci/coverport | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/crossplane-components | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/crossplane-control-plane | No | - | - | No | - | No |
-| konflux-ci/curated-data | No | - | - | No | - | No |
-| konflux-ci/devlake | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/dex | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/diffused | No | - | - | No | - | No |
-| konflux-ci/discussions | No | - | - | No | - | No |
-| konflux-ci/dockerfile-json | No | - | - | No | - | No |
-| konflux-ci/docs | Yes | gemini | config, pr_comments | No | - | No |
-| konflux-ci/e2e-tests | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
-| konflux-ci/etcd-shield | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/git-clone | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/image-controller | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
-| konflux-ci/image-rbac-proxy | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/infra-deployments | No | - | - | No | - | No |
-| konflux-ci/integration-examples | No | - | - | No | - | No |
-| konflux-ci/integration-service | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/integration-service-utils | No | - | - | No | - | No |
-| konflux-ci/internal-services | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/kait-task | No | - | - | No | - | No |
-| konflux-ci/kargo | No | - | - | No | - | No |
-| konflux-ci/ko-builder | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-build-cli | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/konflux-casc | No | - | - | No | - | No |
-| konflux-ci/konflux-ci | Yes | qodo | pr_comments | Yes | Konflux/Tekton, OpenShift CI | **Yes** |
-| konflux-ci/konflux-ci.github.io | Yes | qodo | pr_comments | No | - | No |
-| konflux-ci/konflux-clamav | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-devlake-dashboards | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-devlake-mcp | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-operator-tasks | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-sast-tasks | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-test | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-test-tasks | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/konflux-ui | Yes | coderabbit | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/kueue-external-admission | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/llm-compressor-container | No | - | - | No | - | No |
-| konflux-ci/maven-lockfile | No | - | - | No | - | No |
-| konflux-ci/may | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/mintmaker | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/mintmaker-osv-database | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/mintmaker-presets | No | - | - | No | - | No |
-| konflux-ci/mintmaker-renovate-image | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/mintmaker-schedule-calculator | No | - | - | No | - | No |
-| konflux-ci/mobster | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/multi-arch | No | - | - | No | - | No |
-| konflux-ci/multi-arch-konflux-example | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/multi-platform-controller | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/multi-version-konflux-stage-sample | No | - | - | No | - | No |
-| konflux-ci/namespace-generator | No | - | - | No | - | No |
-| konflux-ci/namespace-lister | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/notification-service | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/oauth2-proxy | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/olm-operator-konflux-sample | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/operator-sdk-builder | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/operator-toolkit | No | - | - | No | - | No |
-| konflux-ci/oras-container | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/paketo-container | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/pipeline-migration-tool | Yes | gemini | config, pr_comments | No | - | No |
-| konflux-ci/pipeline-samples | No | - | - | No | - | No |
-| konflux-ci/planning | No | - | - | No | - | No |
-| konflux-ci/prioritize | No | - | - | No | - | No |
-| konflux-ci/project-controller | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/pulp-tool | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/qe-tools | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/quality-dashboard | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/refresh-rpm-lockfiles | No | - | - | No | - | No |
-| konflux-ci/release-service | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/release-service-automations | No | - | - | No | - | No |
-| konflux-ci/release-service-catalog | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/release-service-catalog-e2e-base | No | - | - | No | - | No |
-| konflux-ci/release-service-collectors | No | - | - | No | - | No |
-| konflux-ci/release-service-docs | No | - | - | No | - | No |
-| konflux-ci/release-service-utils | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/release-test | No | - | - | No | - | No |
-| konflux-ci/renovate-config-validator-action | No | - | - | No | - | No |
-| konflux-ci/renovate-log-analyzer | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/rpm-lockfile-prototype | No | - | - | No | - | No |
-| konflux-ci/rpmbuild-pipeline | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/rpmbuild-pipeline-environment-container | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/rpmbuild-pipeline-monorepo-mock-config-test | No | - | - | No | - | No |
-| konflux-ci/rpmbuild-pipeline-test-sources | No | - | - | No | - | No |
-| konflux-ci/rust-builder | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/sample-component-golang | No | - | - | No | - | No |
-| konflux-ci/segment-bridge | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/signing | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/skills | No | - | - | No | - | No |
-| konflux-ci/smee-sidecar | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/sprayproxy | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/support | No | - | - | No | - | No |
-| konflux-ci/task-repo-shared-ci | Yes | gemini | pr_comments | No | - | No |
-| konflux-ci/task-runner | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/tekton-integration-catalog | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/tekton-kueue | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/tekton-tools | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/tektor | No | - | - | No | - | No |
-| konflux-ci/test-data-sast | No | - | - | No | - | No |
-| konflux-ci/testrepo | No | - | - | No | - | No |
-| konflux-ci/tools | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
-| konflux-ci/workspace-manager | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/yarn-builder | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/yq-container | No | - | - | Yes | Konflux/Tekton | No |
-| konflux-ci/zot | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/.github](https://github.com/konflux-ci/.github) | No | - | - | No | - | No |
+| [konflux-ci/application-api](https://github.com/konflux-ci/application-api) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/architecture](https://github.com/konflux-ci/architecture) | No | - | - | No | - | No |
+| [konflux-ci/bazel-builder](https://github.com/konflux-ci/bazel-builder) | No | - | - | No | - | No |
+| [konflux-ci/brand-assets](https://github.com/konflux-ci/brand-assets) | No | - | - | No | - | No |
+| [konflux-ci/build-definitions](https://github.com/konflux-ci/build-definitions) | Yes | qodo | pr_comments | Yes | Konflux/Tekton, OpenShift CI | **Yes** |
+| [konflux-ci/build-pipeline-tasks](https://github.com/konflux-ci/build-pipeline-tasks) | No | - | - | No | - | No |
+| [konflux-ci/build-service](https://github.com/konflux-ci/build-service) | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
+| [konflux-ci/build-ta-pipeline-migration](https://github.com/konflux-ci/build-ta-pipeline-migration) | No | - | - | No | - | No |
+| [konflux-ci/build-tasks-dockerfiles](https://github.com/konflux-ci/build-tasks-dockerfiles) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/build-trusted-artifacts](https://github.com/konflux-ci/build-trusted-artifacts) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/buildah-container](https://github.com/konflux-ci/buildah-container) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/caching](https://github.com/konflux-ci/caching) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/capo](https://github.com/konflux-ci/capo) | No | - | - | No | - | No |
+| [konflux-ci/ci-helper-app](https://github.com/konflux-ci/ci-helper-app) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/ci-terraform-runner](https://github.com/konflux-ci/ci-terraform-runner) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/clair-in-ci-db](https://github.com/konflux-ci/clair-in-ci-db) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/cli](https://github.com/konflux-ci/cli) | No | - | - | No | - | No |
+| [konflux-ci/cluster-template-charts](https://github.com/konflux-ci/cluster-template-charts) | No | - | - | No | - | No |
+| [konflux-ci/community](https://github.com/konflux-ci/community) | No | - | - | No | - | No |
+| [konflux-ci/community-catalog](https://github.com/konflux-ci/community-catalog) | No | - | - | Yes | OpenShift CI | No |
+| [konflux-ci/community-operators-prod](https://github.com/konflux-ci/community-operators-prod) | No | - | - | No | - | No |
+| [konflux-ci/coverage-dashboard](https://github.com/konflux-ci/coverage-dashboard) | Yes | qodo | pr_comments | No | - | No |
+| [konflux-ci/coverport](https://github.com/konflux-ci/coverport) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/crossplane-components](https://github.com/konflux-ci/crossplane-components) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/crossplane-control-plane](https://github.com/konflux-ci/crossplane-control-plane) | No | - | - | No | - | No |
+| [konflux-ci/curated-data](https://github.com/konflux-ci/curated-data) | No | - | - | No | - | No |
+| [konflux-ci/devlake](https://github.com/konflux-ci/devlake) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/dex](https://github.com/konflux-ci/dex) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/diffused](https://github.com/konflux-ci/diffused) | No | - | - | No | - | No |
+| [konflux-ci/discussions](https://github.com/konflux-ci/discussions) | No | - | - | No | - | No |
+| [konflux-ci/dockerfile-json](https://github.com/konflux-ci/dockerfile-json) | No | - | - | No | - | No |
+| [konflux-ci/docs](https://github.com/konflux-ci/docs) | Yes | gemini | config, pr_comments | No | - | No |
+| [konflux-ci/e2e-tests](https://github.com/konflux-ci/e2e-tests) | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
+| [konflux-ci/etcd-shield](https://github.com/konflux-ci/etcd-shield) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/git-clone](https://github.com/konflux-ci/git-clone) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/image-controller](https://github.com/konflux-ci/image-controller) | No | - | - | Yes | Konflux/Tekton, OpenShift CI | No |
+| [konflux-ci/image-rbac-proxy](https://github.com/konflux-ci/image-rbac-proxy) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/infra-deployments](https://github.com/konflux-ci/infra-deployments) | No | - | - | No | - | No |
+| [konflux-ci/integration-examples](https://github.com/konflux-ci/integration-examples) | No | - | - | No | - | No |
+| [konflux-ci/integration-service](https://github.com/konflux-ci/integration-service) | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/integration-service-utils](https://github.com/konflux-ci/integration-service-utils) | No | - | - | No | - | No |
+| [konflux-ci/internal-services](https://github.com/konflux-ci/internal-services) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/kait-task](https://github.com/konflux-ci/kait-task) | No | - | - | No | - | No |
+| [konflux-ci/kargo](https://github.com/konflux-ci/kargo) | No | - | - | No | - | No |
+| [konflux-ci/ko-builder](https://github.com/konflux-ci/ko-builder) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-build-cli](https://github.com/konflux-ci/konflux-build-cli) | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/konflux-casc](https://github.com/konflux-ci/konflux-casc) | No | - | - | No | - | No |
+| [konflux-ci/konflux-ci](https://github.com/konflux-ci/konflux-ci) | Yes | qodo | pr_comments | Yes | Konflux/Tekton, OpenShift CI | **Yes** |
+| [konflux-ci/konflux-ci.github.io](https://github.com/konflux-ci/konflux-ci.github.io) | Yes | qodo | pr_comments | No | - | No |
+| [konflux-ci/konflux-clamav](https://github.com/konflux-ci/konflux-clamav) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-devlake-dashboards](https://github.com/konflux-ci/konflux-devlake-dashboards) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-devlake-mcp](https://github.com/konflux-ci/konflux-devlake-mcp) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-operator-tasks](https://github.com/konflux-ci/konflux-operator-tasks) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-sast-tasks](https://github.com/konflux-ci/konflux-sast-tasks) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-test](https://github.com/konflux-ci/konflux-test) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-test-tasks](https://github.com/konflux-ci/konflux-test-tasks) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/konflux-ui](https://github.com/konflux-ci/konflux-ui) | Yes | coderabbit | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/kueue-external-admission](https://github.com/konflux-ci/kueue-external-admission) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/llm-compressor-container](https://github.com/konflux-ci/llm-compressor-container) | No | - | - | No | - | No |
+| [konflux-ci/maven-lockfile](https://github.com/konflux-ci/maven-lockfile) | No | - | - | No | - | No |
+| [konflux-ci/may](https://github.com/konflux-ci/may) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/mintmaker](https://github.com/konflux-ci/mintmaker) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/mintmaker-osv-database](https://github.com/konflux-ci/mintmaker-osv-database) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/mintmaker-presets](https://github.com/konflux-ci/mintmaker-presets) | No | - | - | No | - | No |
+| [konflux-ci/mintmaker-renovate-image](https://github.com/konflux-ci/mintmaker-renovate-image) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/mintmaker-schedule-calculator](https://github.com/konflux-ci/mintmaker-schedule-calculator) | No | - | - | No | - | No |
+| [konflux-ci/mobster](https://github.com/konflux-ci/mobster) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/multi-arch](https://github.com/konflux-ci/multi-arch) | No | - | - | No | - | No |
+| [konflux-ci/multi-arch-konflux-example](https://github.com/konflux-ci/multi-arch-konflux-example) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/multi-platform-controller](https://github.com/konflux-ci/multi-platform-controller) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/multi-version-konflux-stage-sample](https://github.com/konflux-ci/multi-version-konflux-stage-sample) | No | - | - | No | - | No |
+| [konflux-ci/namespace-generator](https://github.com/konflux-ci/namespace-generator) | No | - | - | No | - | No |
+| [konflux-ci/namespace-lister](https://github.com/konflux-ci/namespace-lister) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/notification-service](https://github.com/konflux-ci/notification-service) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/oauth2-proxy](https://github.com/konflux-ci/oauth2-proxy) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/olm-operator-konflux-sample](https://github.com/konflux-ci/olm-operator-konflux-sample) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/operator-sdk-builder](https://github.com/konflux-ci/operator-sdk-builder) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/operator-toolkit](https://github.com/konflux-ci/operator-toolkit) | No | - | - | No | - | No |
+| [konflux-ci/oras-container](https://github.com/konflux-ci/oras-container) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/paketo-container](https://github.com/konflux-ci/paketo-container) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/pipeline-migration-tool](https://github.com/konflux-ci/pipeline-migration-tool) | Yes | gemini | config, pr_comments | No | - | No |
+| [konflux-ci/pipeline-samples](https://github.com/konflux-ci/pipeline-samples) | No | - | - | No | - | No |
+| [konflux-ci/planning](https://github.com/konflux-ci/planning) | No | - | - | No | - | No |
+| [konflux-ci/prioritize](https://github.com/konflux-ci/prioritize) | No | - | - | No | - | No |
+| [konflux-ci/project-controller](https://github.com/konflux-ci/project-controller) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/pulp-tool](https://github.com/konflux-ci/pulp-tool) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/qe-tools](https://github.com/konflux-ci/qe-tools) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/quality-dashboard](https://github.com/konflux-ci/quality-dashboard) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/refresh-rpm-lockfiles](https://github.com/konflux-ci/refresh-rpm-lockfiles) | No | - | - | No | - | No |
+| [konflux-ci/release-service](https://github.com/konflux-ci/release-service) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/release-service-automations](https://github.com/konflux-ci/release-service-automations) | No | - | - | No | - | No |
+| [konflux-ci/release-service-catalog](https://github.com/konflux-ci/release-service-catalog) | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/release-service-catalog-e2e-base](https://github.com/konflux-ci/release-service-catalog-e2e-base) | No | - | - | No | - | No |
+| [konflux-ci/release-service-collectors](https://github.com/konflux-ci/release-service-collectors) | No | - | - | No | - | No |
+| [konflux-ci/release-service-docs](https://github.com/konflux-ci/release-service-docs) | No | - | - | No | - | No |
+| [konflux-ci/release-service-utils](https://github.com/konflux-ci/release-service-utils) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/release-test](https://github.com/konflux-ci/release-test) | No | - | - | No | - | No |
+| [konflux-ci/renovate-config-validator-action](https://github.com/konflux-ci/renovate-config-validator-action) | No | - | - | No | - | No |
+| [konflux-ci/renovate-log-analyzer](https://github.com/konflux-ci/renovate-log-analyzer) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/rpm-lockfile-prototype](https://github.com/konflux-ci/rpm-lockfile-prototype) | No | - | - | No | - | No |
+| [konflux-ci/rpmbuild-pipeline](https://github.com/konflux-ci/rpmbuild-pipeline) | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/rpmbuild-pipeline-environment-container](https://github.com/konflux-ci/rpmbuild-pipeline-environment-container) | Yes | gemini | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/rpmbuild-pipeline-monorepo-mock-config-test](https://github.com/konflux-ci/rpmbuild-pipeline-monorepo-mock-config-test) | No | - | - | No | - | No |
+| [konflux-ci/rpmbuild-pipeline-test-sources](https://github.com/konflux-ci/rpmbuild-pipeline-test-sources) | No | - | - | No | - | No |
+| [konflux-ci/rust-builder](https://github.com/konflux-ci/rust-builder) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/sample-component-golang](https://github.com/konflux-ci/sample-component-golang) | No | - | - | No | - | No |
+| [konflux-ci/segment-bridge](https://github.com/konflux-ci/segment-bridge) | Yes | qodo | config, pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/signing](https://github.com/konflux-ci/signing) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/skills](https://github.com/konflux-ci/skills) | No | - | - | No | - | No |
+| [konflux-ci/smee-sidecar](https://github.com/konflux-ci/smee-sidecar) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/sprayproxy](https://github.com/konflux-ci/sprayproxy) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/support](https://github.com/konflux-ci/support) | No | - | - | No | - | No |
+| [konflux-ci/task-repo-shared-ci](https://github.com/konflux-ci/task-repo-shared-ci) | Yes | gemini | pr_comments | No | - | No |
+| [konflux-ci/task-runner](https://github.com/konflux-ci/task-runner) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/tekton-integration-catalog](https://github.com/konflux-ci/tekton-integration-catalog) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/tekton-kueue](https://github.com/konflux-ci/tekton-kueue) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/tekton-tools](https://github.com/konflux-ci/tekton-tools) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/tektor](https://github.com/konflux-ci/tektor) | No | - | - | No | - | No |
+| [konflux-ci/test-data-sast](https://github.com/konflux-ci/test-data-sast) | No | - | - | No | - | No |
+| [konflux-ci/testrepo](https://github.com/konflux-ci/testrepo) | No | - | - | No | - | No |
+| [konflux-ci/tools](https://github.com/konflux-ci/tools) | Yes | qodo | pr_comments | Yes | Konflux/Tekton | **Yes** |
+| [konflux-ci/workspace-manager](https://github.com/konflux-ci/workspace-manager) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/yarn-builder](https://github.com/konflux-ci/yarn-builder) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/yq-container](https://github.com/konflux-ci/yq-container) | No | - | - | Yes | Konflux/Tekton | No |
+| [konflux-ci/zot](https://github.com/konflux-ci/zot) | No | - | - | Yes | Konflux/Tekton | No |
 
 ## Repos with Both AI Review and CI
 
@@ -160,90 +160,90 @@ with test results available:
 
 | Repository | AI Tool | CI Type | AI Detection |
 |------------|---------|---------|--------------|
-| konflux-ci/build-definitions | qodo | Konflux/Tekton, OpenShift CI | pr_comments |
-| konflux-ci/caching | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/etcd-shield | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/image-rbac-proxy | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/integration-service | gemini | Konflux/Tekton | config, pr_comments |
-| konflux-ci/konflux-build-cli | qodo | Konflux/Tekton | config, pr_comments |
-| konflux-ci/konflux-ci | qodo | Konflux/Tekton, OpenShift CI | pr_comments |
-| konflux-ci/konflux-ui | coderabbit | Konflux/Tekton | config, pr_comments |
-| konflux-ci/kueue-external-admission | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/may | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/mobster | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/multi-platform-controller | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/notification-service | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/oauth2-proxy | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/project-controller | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/release-service-catalog | qodo | Konflux/Tekton | config, pr_comments |
-| konflux-ci/rpmbuild-pipeline | gemini | Konflux/Tekton | config, pr_comments |
-| konflux-ci/rpmbuild-pipeline-environment-container | gemini | Konflux/Tekton | config, pr_comments |
-| konflux-ci/segment-bridge | qodo | Konflux/Tekton | config, pr_comments |
-| konflux-ci/smee-sidecar | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/tekton-kueue | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/tekton-tools | qodo | Konflux/Tekton | pr_comments |
-| konflux-ci/tools | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/build-definitions](https://github.com/konflux-ci/build-definitions) | qodo | Konflux/Tekton, OpenShift CI | pr_comments |
+| [konflux-ci/caching](https://github.com/konflux-ci/caching) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/etcd-shield](https://github.com/konflux-ci/etcd-shield) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/image-rbac-proxy](https://github.com/konflux-ci/image-rbac-proxy) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/integration-service](https://github.com/konflux-ci/integration-service) | gemini | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/konflux-build-cli](https://github.com/konflux-ci/konflux-build-cli) | qodo | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/konflux-ci](https://github.com/konflux-ci/konflux-ci) | qodo | Konflux/Tekton, OpenShift CI | pr_comments |
+| [konflux-ci/konflux-ui](https://github.com/konflux-ci/konflux-ui) | coderabbit | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/kueue-external-admission](https://github.com/konflux-ci/kueue-external-admission) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/may](https://github.com/konflux-ci/may) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/mobster](https://github.com/konflux-ci/mobster) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/multi-platform-controller](https://github.com/konflux-ci/multi-platform-controller) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/notification-service](https://github.com/konflux-ci/notification-service) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/oauth2-proxy](https://github.com/konflux-ci/oauth2-proxy) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/project-controller](https://github.com/konflux-ci/project-controller) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/release-service-catalog](https://github.com/konflux-ci/release-service-catalog) | qodo | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/rpmbuild-pipeline](https://github.com/konflux-ci/rpmbuild-pipeline) | gemini | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/rpmbuild-pipeline-environment-container](https://github.com/konflux-ci/rpmbuild-pipeline-environment-container) | gemini | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/segment-bridge](https://github.com/konflux-ci/segment-bridge) | qodo | Konflux/Tekton | config, pr_comments |
+| [konflux-ci/smee-sidecar](https://github.com/konflux-ci/smee-sidecar) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/tekton-kueue](https://github.com/konflux-ci/tekton-kueue) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/tekton-tools](https://github.com/konflux-ci/tekton-tools) | qodo | Konflux/Tekton | pr_comments |
+| [konflux-ci/tools](https://github.com/konflux-ci/tools) | qodo | Konflux/Tekton | pr_comments |
 
 ## Repos with AI Review Only (No CI Detected)
 
 | Repository | AI Tool | Detection |
 |------------|---------|-----------|
-| konflux-ci/coverage-dashboard | qodo | pr_comments |
-| konflux-ci/docs | gemini | config, pr_comments |
-| konflux-ci/konflux-ci.github.io | qodo | pr_comments |
-| konflux-ci/pipeline-migration-tool | gemini | config, pr_comments |
-| konflux-ci/task-repo-shared-ci | gemini | pr_comments |
+| [konflux-ci/coverage-dashboard](https://github.com/konflux-ci/coverage-dashboard) | qodo | pr_comments |
+| [konflux-ci/docs](https://github.com/konflux-ci/docs) | gemini | config, pr_comments |
+| [konflux-ci/konflux-ci.github.io](https://github.com/konflux-ci/konflux-ci.github.io) | qodo | pr_comments |
+| [konflux-ci/pipeline-migration-tool](https://github.com/konflux-ci/pipeline-migration-tool) | gemini | config, pr_comments |
+| [konflux-ci/task-repo-shared-ci](https://github.com/konflux-ci/task-repo-shared-ci) | gemini | pr_comments |
 
 ## Repos with CI Only (No AI Review Detected)
 
 | Repository | CI Type |
 |------------|---------|
-| konflux-ci/application-api | Konflux/Tekton |
-| konflux-ci/build-service | Konflux/Tekton, OpenShift CI |
-| konflux-ci/build-tasks-dockerfiles | Konflux/Tekton |
-| konflux-ci/build-trusted-artifacts | Konflux/Tekton |
-| konflux-ci/buildah-container | Konflux/Tekton |
-| konflux-ci/ci-helper-app | Konflux/Tekton |
-| konflux-ci/ci-terraform-runner | Konflux/Tekton |
-| konflux-ci/clair-in-ci-db | Konflux/Tekton |
-| konflux-ci/community-catalog | OpenShift CI |
-| konflux-ci/coverport | Konflux/Tekton |
-| konflux-ci/crossplane-components | Konflux/Tekton |
-| konflux-ci/devlake | Konflux/Tekton |
-| konflux-ci/dex | Konflux/Tekton |
-| konflux-ci/e2e-tests | Konflux/Tekton, OpenShift CI |
-| konflux-ci/git-clone | Konflux/Tekton |
-| konflux-ci/image-controller | Konflux/Tekton, OpenShift CI |
-| konflux-ci/internal-services | Konflux/Tekton |
-| konflux-ci/ko-builder | Konflux/Tekton |
-| konflux-ci/konflux-clamav | Konflux/Tekton |
-| konflux-ci/konflux-devlake-dashboards | Konflux/Tekton |
-| konflux-ci/konflux-devlake-mcp | Konflux/Tekton |
-| konflux-ci/konflux-operator-tasks | Konflux/Tekton |
-| konflux-ci/konflux-sast-tasks | Konflux/Tekton |
-| konflux-ci/konflux-test | Konflux/Tekton |
-| konflux-ci/konflux-test-tasks | Konflux/Tekton |
-| konflux-ci/mintmaker | Konflux/Tekton |
-| konflux-ci/mintmaker-osv-database | Konflux/Tekton |
-| konflux-ci/mintmaker-renovate-image | Konflux/Tekton |
-| konflux-ci/multi-arch-konflux-example | Konflux/Tekton |
-| konflux-ci/namespace-lister | Konflux/Tekton |
-| konflux-ci/olm-operator-konflux-sample | Konflux/Tekton |
-| konflux-ci/operator-sdk-builder | Konflux/Tekton |
-| konflux-ci/oras-container | Konflux/Tekton |
-| konflux-ci/paketo-container | Konflux/Tekton |
-| konflux-ci/pulp-tool | Konflux/Tekton |
-| konflux-ci/qe-tools | Konflux/Tekton |
-| konflux-ci/quality-dashboard | Konflux/Tekton |
-| konflux-ci/release-service | Konflux/Tekton |
-| konflux-ci/release-service-utils | Konflux/Tekton |
-| konflux-ci/renovate-log-analyzer | Konflux/Tekton |
-| konflux-ci/rust-builder | Konflux/Tekton |
-| konflux-ci/signing | Konflux/Tekton |
-| konflux-ci/sprayproxy | Konflux/Tekton |
-| konflux-ci/task-runner | Konflux/Tekton |
-| konflux-ci/tekton-integration-catalog | Konflux/Tekton |
-| konflux-ci/workspace-manager | Konflux/Tekton |
-| konflux-ci/yarn-builder | Konflux/Tekton |
-| konflux-ci/yq-container | Konflux/Tekton |
-| konflux-ci/zot | Konflux/Tekton |
+| [konflux-ci/application-api](https://github.com/konflux-ci/application-api) | Konflux/Tekton |
+| [konflux-ci/build-service](https://github.com/konflux-ci/build-service) | Konflux/Tekton, OpenShift CI |
+| [konflux-ci/build-tasks-dockerfiles](https://github.com/konflux-ci/build-tasks-dockerfiles) | Konflux/Tekton |
+| [konflux-ci/build-trusted-artifacts](https://github.com/konflux-ci/build-trusted-artifacts) | Konflux/Tekton |
+| [konflux-ci/buildah-container](https://github.com/konflux-ci/buildah-container) | Konflux/Tekton |
+| [konflux-ci/ci-helper-app](https://github.com/konflux-ci/ci-helper-app) | Konflux/Tekton |
+| [konflux-ci/ci-terraform-runner](https://github.com/konflux-ci/ci-terraform-runner) | Konflux/Tekton |
+| [konflux-ci/clair-in-ci-db](https://github.com/konflux-ci/clair-in-ci-db) | Konflux/Tekton |
+| [konflux-ci/community-catalog](https://github.com/konflux-ci/community-catalog) | OpenShift CI |
+| [konflux-ci/coverport](https://github.com/konflux-ci/coverport) | Konflux/Tekton |
+| [konflux-ci/crossplane-components](https://github.com/konflux-ci/crossplane-components) | Konflux/Tekton |
+| [konflux-ci/devlake](https://github.com/konflux-ci/devlake) | Konflux/Tekton |
+| [konflux-ci/dex](https://github.com/konflux-ci/dex) | Konflux/Tekton |
+| [konflux-ci/e2e-tests](https://github.com/konflux-ci/e2e-tests) | Konflux/Tekton, OpenShift CI |
+| [konflux-ci/git-clone](https://github.com/konflux-ci/git-clone) | Konflux/Tekton |
+| [konflux-ci/image-controller](https://github.com/konflux-ci/image-controller) | Konflux/Tekton, OpenShift CI |
+| [konflux-ci/internal-services](https://github.com/konflux-ci/internal-services) | Konflux/Tekton |
+| [konflux-ci/ko-builder](https://github.com/konflux-ci/ko-builder) | Konflux/Tekton |
+| [konflux-ci/konflux-clamav](https://github.com/konflux-ci/konflux-clamav) | Konflux/Tekton |
+| [konflux-ci/konflux-devlake-dashboards](https://github.com/konflux-ci/konflux-devlake-dashboards) | Konflux/Tekton |
+| [konflux-ci/konflux-devlake-mcp](https://github.com/konflux-ci/konflux-devlake-mcp) | Konflux/Tekton |
+| [konflux-ci/konflux-operator-tasks](https://github.com/konflux-ci/konflux-operator-tasks) | Konflux/Tekton |
+| [konflux-ci/konflux-sast-tasks](https://github.com/konflux-ci/konflux-sast-tasks) | Konflux/Tekton |
+| [konflux-ci/konflux-test](https://github.com/konflux-ci/konflux-test) | Konflux/Tekton |
+| [konflux-ci/konflux-test-tasks](https://github.com/konflux-ci/konflux-test-tasks) | Konflux/Tekton |
+| [konflux-ci/mintmaker](https://github.com/konflux-ci/mintmaker) | Konflux/Tekton |
+| [konflux-ci/mintmaker-osv-database](https://github.com/konflux-ci/mintmaker-osv-database) | Konflux/Tekton |
+| [konflux-ci/mintmaker-renovate-image](https://github.com/konflux-ci/mintmaker-renovate-image) | Konflux/Tekton |
+| [konflux-ci/multi-arch-konflux-example](https://github.com/konflux-ci/multi-arch-konflux-example) | Konflux/Tekton |
+| [konflux-ci/namespace-lister](https://github.com/konflux-ci/namespace-lister) | Konflux/Tekton |
+| [konflux-ci/olm-operator-konflux-sample](https://github.com/konflux-ci/olm-operator-konflux-sample) | Konflux/Tekton |
+| [konflux-ci/operator-sdk-builder](https://github.com/konflux-ci/operator-sdk-builder) | Konflux/Tekton |
+| [konflux-ci/oras-container](https://github.com/konflux-ci/oras-container) | Konflux/Tekton |
+| [konflux-ci/paketo-container](https://github.com/konflux-ci/paketo-container) | Konflux/Tekton |
+| [konflux-ci/pulp-tool](https://github.com/konflux-ci/pulp-tool) | Konflux/Tekton |
+| [konflux-ci/qe-tools](https://github.com/konflux-ci/qe-tools) | Konflux/Tekton |
+| [konflux-ci/quality-dashboard](https://github.com/konflux-ci/quality-dashboard) | Konflux/Tekton |
+| [konflux-ci/release-service](https://github.com/konflux-ci/release-service) | Konflux/Tekton |
+| [konflux-ci/release-service-utils](https://github.com/konflux-ci/release-service-utils) | Konflux/Tekton |
+| [konflux-ci/renovate-log-analyzer](https://github.com/konflux-ci/renovate-log-analyzer) | Konflux/Tekton |
+| [konflux-ci/rust-builder](https://github.com/konflux-ci/rust-builder) | Konflux/Tekton |
+| [konflux-ci/signing](https://github.com/konflux-ci/signing) | Konflux/Tekton |
+| [konflux-ci/sprayproxy](https://github.com/konflux-ci/sprayproxy) | Konflux/Tekton |
+| [konflux-ci/task-runner](https://github.com/konflux-ci/task-runner) | Konflux/Tekton |
+| [konflux-ci/tekton-integration-catalog](https://github.com/konflux-ci/tekton-integration-catalog) | Konflux/Tekton |
+| [konflux-ci/workspace-manager](https://github.com/konflux-ci/workspace-manager) | Konflux/Tekton |
+| [konflux-ci/yarn-builder](https://github.com/konflux-ci/yarn-builder) | Konflux/Tekton |
+| [konflux-ci/yq-container](https://github.com/konflux-ci/yq-container) | Konflux/Tekton |
+| [konflux-ci/zot](https://github.com/konflux-ci/zot) | Konflux/Tekton |
