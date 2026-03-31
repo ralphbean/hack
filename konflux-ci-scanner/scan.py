@@ -62,13 +62,20 @@ QODO_WORKFLOW_PATTERNS = [
     "codiumai/pr-agent",
 ]
 
-# Common Tekton filename suffixes to probe via raw.githubusercontent.com
+# Tekton filename patterns to probe via raw.githubusercontent.com
 # When API budget is exhausted, we try these patterns instead of listing dirs.
-TEKTON_PROBE_SUFFIXES = [
-    "-pull-request.yaml",
-    "-push.yaml",
-    "-pull-request.yml",
-    "-push.yml",
+# Pattern types:
+#   "{repo}" is replaced with the repo name
+#   Literal strings are tried as-is
+TEKTON_PROBE_PATTERNS = [
+    # Standard Konflux naming: {reponame}-{event}.yaml
+    ".tekton/{repo}-pull-request.yaml",
+    ".tekton/{repo}-push.yaml",
+    # Bare naming (no repo prefix)
+    ".tekton/pull-request.yaml",
+    ".tekton/push.yaml",
+    # Common extra pipeline files
+    ".tekton/build-pipeline.yaml",
 ]
 
 
@@ -296,11 +303,12 @@ def check_tekton_via_raw(
     """Check for .tekton/ pipeline files using raw.githubusercontent.com.
 
     Tries common Konflux filename conventions. No API quota cost, but may
-    miss repos with non-standard naming.
+    miss repos with unusual naming (e.g., hash suffixes, component names
+    that differ significantly from the repo name).
     """
     found_files = []
-    for suffix in TEKTON_PROBE_SUFFIXES:
-        path = f".tekton/{repo}{suffix}"
+    for pattern in TEKTON_PROBE_PATTERNS:
+        path = pattern.format(repo=repo)
         if client.raw_exists(owner, repo, branch, path):
             found_files.append(path)
 
