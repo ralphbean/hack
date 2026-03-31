@@ -45,10 +45,10 @@ python3 scan.py --org my-org
 | **Qodo / PR-Agent** | `.pr_agent.toml` in repo root; GitHub Actions workflows referencing `qodo-ai/pr-agent` or `codiumai/pr-agent`; also checks `{org}/pr-agent-settings` repo |
 | **Gemini Code Assist** | `.gemini/config.yaml` or `.gemini/styleguide.md` in repo |
 
-**Limitation:** All three tools can be active with zero config files (installed
-purely as GitHub Apps with default settings). Detecting that requires either
-admin-scoped API access or inspecting recent PR comments for bot activity. This
-script only detects repos with explicit configuration files.
+With `--github-token`, the script also searches PR comment history for bot
+activity (`coderabbitai[bot]`, `qodo-code-review[bot]`, `gemini-code-assist[bot]`).
+This catches tools installed as GitHub Apps with default settings (no config file).
+Without a token, only config-file detection is available.
 
 ### CI with JUnit/Test Results
 
@@ -69,10 +69,15 @@ The script uses a hybrid strategy to minimize GitHub API calls:
 Unauthenticated API budget: ~60 requests/hour. A typical scan of ~150 repos
 uses approximately:
 - 2 API calls to list repos
-- ~150 API calls for repo trees (one per repo)
+- ~150 API calls for .tekton/ directory listings (one per repo)
 - 3 API calls for OpenShift CI batch checks
 
-With a token, the 5,000 req/hr limit is more than sufficient.
+With a token (recommended), the 5,000 req/hr limit is more than sufficient,
+and the PR comment search feature is enabled (3 additional search API calls).
+
+## Results
+
+See [RESULTS.md](RESULTS.md) for the latest scan output.
 
 ## Output Formats
 
