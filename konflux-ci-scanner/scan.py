@@ -24,6 +24,7 @@ import io
 import json
 import logging
 import os
+import platform
 import sys
 import time
 import urllib.error
@@ -33,6 +34,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from threading import Lock
 from typing import Optional
+
+# macOS-specific imports for SSL certificate handling
+if platform.system() == "Darwin":
+    import certifi
+    import ssl
 
 logging.basicConfig(
     level=logging.INFO,
@@ -196,10 +202,24 @@ class GitHubClient:
         req.add_header("Accept", accept)
         req.add_header("User-Agent", "konflux-ci-scanner/1.0")
         if self.token:
-            req.add_header("Authorization", f"Bearer {self.token}")
+            # GitHub API accepts both "Bearer" and "token" prefixes
+            # Use "token" for broader compatibility
+            req.add_header("Authorization", f"token {self.token}")
+
+        # macOS-specific SSL context configuration
+        # On macOS, use certifi for reliable certificate verification
+        if platform.system() == "Darwin":
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+        else:
+            ssl_context = None
 
         try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
+            if ssl_context:
+                resp_ctx = urllib.request.urlopen(req, timeout=15, context=ssl_context)
+            else:
+                resp_ctx = urllib.request.urlopen(req, timeout=15)
+
+            with resp_ctx as resp:
                 headers = {k.lower(): v for k, v in resp.getheaders()}
                 return resp.status, resp.read(), headers
         except urllib.error.HTTPError as e:
