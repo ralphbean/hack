@@ -9,6 +9,10 @@ Scans the `konflux-ci` GitHub organization to identify repositories that have:
 
 - Python 3.10+
 - No external dependencies (uses only the Python standard library)
+- **macOS only**: `certifi` package for SSL certificate verification
+  ```bash
+  pip install certifi
+  ```
 
 ## Usage
 
